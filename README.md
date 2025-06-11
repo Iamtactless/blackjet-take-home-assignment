@@ -30,6 +30,7 @@ pnpm run dev
 - All bookings are round trips
 - Empty seat bookings are automatically confirmed
 - Maximum 2 pets allowed per flight
+- Pets are seated in the luggage area, so you don't have to care about reserving seats for pets
 
 ### Pet Booking Rules
 
@@ -75,20 +76,21 @@ should include:
    - This endpoint should accept the following:
    - Outbound Flight Number and Date - eg. BKJT123, 07/04/2025
    - Inbound Flight Number and Date - eg. BKJT234, 08/04/2025
-   - Seat number - eg. 1
+   - Outbound Seat number - eg. 1
+   - Inbound Seat number - eg. 1
    - User id - eg. 1
-2. API endpoint to get all flights - eg. GET /flights
+3. API endpoint to get all flights - eg. GET /flights
    - This endpoint should be paginated and should accept the following:
    - Flight number - eg. BKJT123 (optional)
    - Date - eg. 07/04/2025 (optional)
-3. API endpoint to get user booking itineraries - eg. GET /flights/itineraries
+4. API endpoint to get user booking itineraries - eg. GET /flights/itineraries
    - User id - eg. 1
-4. API endpoint to reject pets on flight - eg. POST /flights/rejection
+5. API endpoint to reject pets on flight - eg. POST /flights/rejection
    - This endpoint should accept the following:
    - Flight number - eg. BKJT123
    - Date - eg. 07/04/2025
    - Confirmed Seat Number - eg. 4
-5. Cron job to confirm/cancel pet booking based on whether someone accept/reject having pets on flight
+6. Cron job to confirm/cancel pet booking based on whether someone accept/reject having pets on flight
 
 ### Seed Data
 
