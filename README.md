@@ -5,23 +5,6 @@
 Build a flight booking system backend API for BlackJet Airlines that handles seat reservations and
 pet accommodations.
 
-## Setup & Running
-
-1. Install [Node.js](https://nodejs.org/en/)
-2. Install dependencies:
-
-```bash
-pnpm install
-```
-
-3. Run the development server:
-
-```bash
-pnpm run dev
-```
-
-4. Access the application at `http://localhost:3000`
-
 ## Business Rules
 
 ### Flight & Booking Rules
@@ -54,7 +37,7 @@ should include:
 
 ### Technical Requirements
 
-- Backend: Node.js with Express and TypeScript
+- Backend: Node.js with NestJS and TypeScript
 - Database: Any SQL Database with [Drizzle ORM](https://orm.drizzle.team/)
 - Documentation: OpenAPI/Swagger specification
 
@@ -97,12 +80,15 @@ should include:
 The `seed_data` directory contains the following CSV files for seeding the database:
 
 #### flights.csv
+
 Contains flight information:
+
 - Flight numbers (format: BKJT123)
 - Flight dates
 - Currently occupied seats
 
 Sample format:
+
 ```csv
 Flight_Number,Date,Seats_Taken
 BKJT456,07/04/2025,"1,4,6"
@@ -110,13 +96,16 @@ BKJT234,09/04/2025,"2,5"
 ```
 
 #### users.csv
+
 Contains user information:
+
 - User ID
 - First name
 - Last name
 - Number of pets (between 0-2)
 
 Sample format:
+
 ```csv
 Id,First_Name,Last_Name,Number_of_Pets
 1,Emma,Thompson,0
@@ -125,13 +114,16 @@ Id,First_Name,Last_Name,Number_of_Pets
 ```
 
 #### seatings.csv
+
 Maps flights to users by seat assignments:
+
 - Flight number
 - Flight date
 - Seat number
 - User ID (references users.csv)
 
 Sample format:
+
 ```csv
 Flight_Number,Date,Seat_Number,User_Id
 BKJT456,07/04/2025,1,1
@@ -140,6 +132,7 @@ BKJT456,07/04/2025,6,7
 ```
 
 You should use this data to:
+
 1. Seed your database
 2. Test your booking system
 3. Validate your API endpoints
