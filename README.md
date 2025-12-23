@@ -5,8 +5,15 @@ A flight booking system backend API for BlackJet Airlines.
 ## Business Rules
 
 - Each flight has **8 seats** (numbered 1-8)
-- All bookings are **round trips** (outbound + inbound)
+- All bookings are **return round trips** (outbound + inbound)
 - Empty seat bookings are automatically confirmed
+
+## Technical Requirements
+
+- Write clean, maintainable code
+- Include API integration tests
+- Design a well-structured database schema
+- Follow the existing code architecture
 
 ## Tech Stack
 
