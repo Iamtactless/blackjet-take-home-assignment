@@ -147,25 +147,13 @@ Flight BKJT999 on 01/05/2025 has only seat 8 available. 10 users simultaneously 
 - [ ] Seed data loaded from CSV files
 - [ ] Unit tests for booking logic
 - [ ] Integration test demonstrating race condition handling
+- [ ] OpenAPI/Swagger documentations
 
 ### Bonus
 
-- [ ] OpenAPI/Swagger documentation
 - [ ] E2E tests with concurrent WebSocket clients
 - [ ] Connection recovery handling (client reconnects)
 - [ ] Metrics/logging for concurrent booking attempts
-
----
-
-## Evaluation Criteria
-
-| Criteria           | Weight | Description                                                |
-| ------------------ | ------ | ---------------------------------------------------------- |
-| **Correctness**    | 30%    | No overbookings under concurrent load, atomic transactions |
-| **Real-time Sync** | 25%    | WebSocket clients receive consistent, timely updates       |
-| **Code Quality**   | 20%    | Clean architecture, TypeScript usage, error handling       |
-| **Testing**        | 15%    | Meaningful tests that verify concurrency behavior          |
-| **Documentation**  | 10%    | Clear README, API docs, explanation of locking strategy    |
 
 ---
 
