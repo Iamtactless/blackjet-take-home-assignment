@@ -24,24 +24,15 @@ Your task is to build a **real-time flight booking system** that:
 
 ---
 
-## Technical Requirements
+## Deliverables
 
-### Tech Stack (Required)
+### REST API Endpoint
 
-- **Backend**: Node.js + NestJS + TypeScript
-- **Database**: SQL with [Drizzle ORM](https://orm.drizzle.team/)
-- **WebSockets**: NestJS WebSocket Gateway (Socket.IO or native WS)
-- **Docs**: OpenAPI/Swagger
+| Method | Endpoint              | Description              |
+| ------ | --------------------- | ------------------------ |
+| `POST` | `/api/flight/booking` | Book a round-trip flight |
 
-### Part 1: REST API
-
-#### 1.1 Book a Flight
-
-```
-POST /api/flight/booking
-```
-
-**Request Body:**
+#### Request Payload
 
 ```json
 {
@@ -55,7 +46,7 @@ POST /api/flight/booking
 }
 ```
 
-**Success Response (201):**
+#### Success Response (201 Created)
 
 ```json
 {
@@ -66,7 +57,7 @@ POST /api/flight/booking
 }
 ```
 
-**Conflict Response (409):**
+#### Error Response (409 Conflict)
 
 ```json
 {
@@ -80,104 +71,54 @@ POST /api/flight/booking
 
 ---
 
-### Part 2: WebSocket Gateway
+### WebSocket Gateway
 
-#### 2.1 Real-Time Seat Availability
+**Connection URL:** `ws://localhost:3000`
 
-**Connection:**
+| Event (Client → Server) | Payload                                               | Description                            |
+| ----------------------- | ----------------------------------------------------- | -------------------------------------- |
+| `subscribe`             | `{ "flightNumber": "BKJT123", "date": "07/04/2025" }` | Subscribe to seat updates for a flight |
+| `unsubscribe`           | `{ "flightNumber": "BKJT123", "date": "07/04/2025" }` | Unsubscribe from a flight              |
 
-```
-ws://localhost:3000/flights
-```
+| Event (Server → Client) | Payload   | Description                         |
+| ----------------------- | --------- | ----------------------------------- |
+| `seats_snapshot`        | See below | Sent immediately after subscribing  |
+| `seats_updated`         | See below | Sent when seat availability changes |
 
-**Subscribe to a flight:**
+#### `seats_snapshot` (sent on subscribe)
 
 ```json
 {
-  "event": "subscribe",
-  "data": { "flightNumber": "BKJT123", "date": "07/04/2025" }
+  "flightNumber": "BKJT123",
+  "date": "07/04/2025",
+  "availableSeats": [1, 2, 5, 6, 7],
+  "totalSeats": 8,
+  "timestamp": "2025-04-01T10:30:00Z"
 }
 ```
 
-**Immediate response with current availability:**
+#### `seats_updated` (sent when booking occurs)
 
 ```json
 {
-  "event": "seats_snapshot",
-  "data": {
-    "flightNumber": "BKJT123",
-    "date": "07/04/2025",
-    "availableSeats": [1, 2, 5, 6, 7],
-    "totalSeats": 8,
-    "timestamp": "2025-04-01T10:30:00Z"
-  }
-}
-```
-
-**Receive updates when seats change:**
-
-```json
-{
-  "event": "seats_updated",
-  "data": {
-    "flightNumber": "BKJT123",
-    "date": "07/04/2025",
-    "availableSeats": [1, 2, 6, 7],
-    "lastBookedSeat": 5,
-    "timestamp": "2025-04-01T10:30:00Z"
-  }
-}
-```
-
-**Unsubscribe:**
-
-```json
-{
-  "event": "unsubscribe",
-  "data": { "flightNumber": "BKJT123", "date": "07/04/2025" }
-}
-```
-
-#### 2.2 Booking Result Notification
-
-When a client attempts to book via REST API, they can also receive the result via WebSocket:
-
-**Success:**
-
-```json
-{
-  "event": "booking_confirmed",
-  "data": {
-    "bookingId": "<uuid>",
-    "outbound": { "flightNumber": "BKJT123", "seat": 5 },
-    "inbound": { "flightNumber": "BKJT234", "seat": 3 }
-  }
-}
-```
-
-**Failure (seat taken by another user):**
-
-```json
-{
-  "event": "booking_failed",
-  "data": {
-    "reason": "seat_unavailable",
-    "conflictingSeat": { "flightNumber": "BKJT123", "seat": 5 },
-    "availableSeats": [1, 2, 6, 7]
-  }
+  "flightNumber": "BKJT123",
+  "date": "07/04/2025",
+  "availableSeats": [1, 2, 6, 7],
+  "lastBookedSeat": 5,
+  "timestamp": "2025-04-01T10:30:00Z"
 }
 ```
 
 ---
 
-### Part 3: Race Condition Handling
+### Race Condition Handling
 
-You must implement a strategy to prevent race conditions. Document your approach in a section below.
+You must implement a strategy to prevent race conditions. Document your approach.
 
 **Acceptable Strategies:**
 
 - Database-level constraints (UNIQUE, transactions with proper isolation)
-- Optimistic locki ng (version columns)
+- Optimistic locking (version columns)
 - Pessimistic locking (SELECT FOR UPDATE)
 - Application-level locking (with caveats documented)
 
@@ -187,21 +128,21 @@ Flight BKJT999 on 01/05/2025 has only seat 8 available. 10 users simultaneously 
 **Expected Outcome:**
 
 - Exactly 1 booking succeeds
-- Exactly 9 bookings fail with appropriate error
-- All WebSocket subscribers see exactly 1 update showing seat 8 as taken
+- Exactly 9 bookings fail with 409 error
+- All WebSocket subscribers see exactly 1 `seats_updated` event
 - No database inconsistencies
 
 ---
 
-## Deliverables
+## Checklist
 
 ### Required
 
-- [ ] Working REST API (all 3 endpoints)
-- [ ] WebSocket gateway with subscribe/unsubscribe
-- [ ] Real-time seat updates broadcast to subscribers
-- [ ] Race condition handling (no overbookings)
-- [ ] Atomic round-trip bookings (both succeed or both fail)
+- [ ] `POST /api/flight/booking` - handles concurrent requests safely
+- [ ] WebSocket `subscribe` event - returns `seats_snapshot`
+- [ ] WebSocket `seats_updated` broadcast - sent to all subscribers when booking occurs
+- [ ] Race condition handling - no overbookings under load
+- [ ] Atomic bookings - both outbound and inbound succeed or both fail
 - [ ] Database schema with Drizzle ORM
 - [ ] Seed data loaded from CSV files
 - [ ] Unit tests for booking logic
@@ -228,23 +169,12 @@ Flight BKJT999 on 01/05/2025 has only seat 8 available. 10 users simultaneously 
 
 ---
 
-## Your Approach (Fill This Section)
+## Tech Stack
 
-### Concurrency Strategy
-
-_Explain your approach to handling race conditions:_
-
-```
-[Your explanation here]
-```
-
-### Trade-offs
-
-_What trade-offs did you make? What would you do differently with more time?_
-
-```
-[Your explanation here]
-```
+- **Backend**: Node.js + NestJS + TypeScript
+- **Database**: SQL with [Drizzle ORM](https://orm.drizzle.team/)
+- **WebSockets**: NestJS WebSocket Gateway (Socket.IO)
+- **Docs**: OpenAPI/Swagger (bonus)
 
 ---
 
@@ -283,15 +213,17 @@ src/
 
 ````bash
 # Install dependencies
-npm install
+pnpm install
 
 # Run development server
-npm run dev
+pnpm dev
 
 # Run tests
-npm test
+pnpm test
 
-# Run E2E tests
-npm run test:e2e
-```s
+# Test the sample WebSocket implementation
+pnpm test:ws
+```
+
+A sample WebSocket gateway is provided in `src/modules/hello/presentation/gateways/hello.gateway.ts` for reference. Run `pnpm test:ws` to see how it works.
 ````
